@@ -1,0 +1,8 @@
+asset_id,symbol,asset_name,asset_class,currency
+A001,SPY,US Equity,Equity,USD
+A002,IEF,US Treasury,Bond,USD
+A003,LQD,US Corporate Bond,Bond,USD
+A004,GLD,Gold,Alternative,USD
+A005,VNQ,US Real Estate,Alternative,USD
+A006,EXSA.DE,Europe Equity,Equity,EUR
+A007,1321.T,Japan Equity,Equity,JPY
