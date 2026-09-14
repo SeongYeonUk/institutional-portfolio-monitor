@@ -7,7 +7,9 @@ import pandas as pd
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DB_PATH = BASE_DIR / "db" / "portfolio.db"
+
 SCHEMA_PATH = BASE_DIR / "sql" / "schema.sql"
+SECURITIES_SCHEMA_PATH = BASE_DIR / "sql" / "securities_schema.sql"
 
 ASSET_PATH = BASE_DIR / "data" / "raw" / "assets.csv"
 TRADE_PATH = BASE_DIR / "data" / "raw" / "trades.csv"
@@ -22,6 +24,9 @@ def load_csv(path):
 def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
+    if DB_PATH.exists():
+        DB_PATH.unlink()
+
     assets = load_csv(ASSET_PATH)
     trades = load_csv(TRADE_PATH)
     prices = load_csv(PRICE_PATH)
@@ -31,11 +36,19 @@ def init_db():
 
         conn.execute("PRAGMA foreign_keys = ON")
 
+        # 기존 포트폴리오 스키마
         with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
             schema_sql = f.read()
 
         conn.executescript(schema_sql)
 
+        # 증권거래 확장 스키마
+        with open(SECURITIES_SCHEMA_PATH, "r", encoding="utf-8") as f:
+            securities_schema_sql = f.read()
+
+        conn.executescript(securities_schema_sql)
+
+        # 기존 데이터 적재
         assets.to_sql(
             "asset",
             conn,
@@ -73,7 +86,10 @@ def init_db():
             "asset",
             "trade",
             "price",
-            "fx_rate"
+            "fx_rate",
+            "securities_orders",
+            "securities_executions",
+            "securities_settlements"
         ]
 
         print()
@@ -84,7 +100,7 @@ def init_db():
                 f"SELECT COUNT(*) FROM {table}"
             ).fetchone()[0]
 
-            print(f"{table:10s}: {count}")
+            print(f"{table:25s}: {count}")
 
 
 if __name__ == "__main__":
